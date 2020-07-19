@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import db.DB;
 import db.DBException;
@@ -80,6 +83,45 @@ public class SellerDaoJDBC implements SellerDao{
 	public List<Seller> findAll() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<Seller> findByDepartment(Department department) {
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			pst = conn.prepareStatement("select seller.*, department.Name as Department from seller inner join department "
+					+ "on seller.DepartmentId = department.Id where seller.DepartmentId = ? order by seller.Name");
+			
+			pst.setInt(1, department.getId());
+			
+			rs = pst.executeQuery();
+			
+			List<Seller> seller = new ArrayList<>();
+			
+			Map<Integer, Department> departments = new HashMap<>();
+			
+			while(rs.next()) {
+				Department dp = departments.get(rs.getInt("DepartmentId"));
+				
+				if(dp == null) {
+					dp = instantiateDepartment(rs);
+					departments.put(rs.getInt("DepartmentId"), dp);
+				}
+								
+				seller.add(instantiateSeller(rs, dp)); 
+			}
+			
+			return seller;
+			
+		} catch (SQLException e) {
+			throw new DBException(e.getMessage());
+		} finally {
+			DB.closeResultSet(rs);
+			DB.closeStatement(pst);
+			//não fechar a conexão pois esse objeto pode servir para fazer mais de uma operação
+		}		
 	}
 	
 }
