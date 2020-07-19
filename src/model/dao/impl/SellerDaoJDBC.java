@@ -1,9 +1,11 @@
 package model.dao.impl;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +27,37 @@ public class SellerDaoJDBC implements SellerDao{
 	
 	@Override
 	public void insert(Seller seller) {
-		// TODO Auto-generated method stub
+		PreparedStatement pst = null;
 		
+		try {
+			pst = conn.prepareStatement(
+					"INSERT INTO seller "
+					+ "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
+					+ "VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);//cada interrogação corresponde a uma coluna que você vai alterar(índice inicia em 1)
+
+			pst.setString(1, seller.getName());
+			pst.setString(2, seller.getEmail());
+			pst.setDate(3, new Date(seller.getBirthDate().getTime()));
+			pst.setDouble(4, seller.getBaseSalary());//Date do java.sql.Date
+			pst.setInt(5, seller.getDepartment().getId());
+			
+			int rowsAffected = pst.executeUpdate();
+			
+			if(rowsAffected > 0) {
+				ResultSet rs = pst.getGeneratedKeys();//nesse caso gera-se uma única coluna com os Ids gerados
+				if(rs.next()) {
+					seller.setId(rs.getInt(1));//por ter-se gerado uma coluna, usa-se o 1 como número da coluna para pegar o ID
+				}
+				DB.closeResultSet(rs);
+			} else {
+				throw new DBException("Unexpected error!! No rows affected!");
+			}
+			
+		} catch(SQLException e) {
+			throw new DBException(e.getMessage());
+		} finally {
+			DB.closeStatement(pst);
+		}
 	}
 
 	@Override
