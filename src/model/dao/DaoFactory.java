@@ -1,5 +1,6 @@
 package model.dao;
 
+import db.DB;
 import model.dao.impl.SellerDaoJDBC;
 
 public class DaoFactory {
@@ -7,7 +8,7 @@ public class DaoFactory {
    //dessa forma a classe principal não conhecerá a implementação de SellerDao a SellerDaoJDBC, ou seja, fica mais prático de implementar	
 	
 	public static SellerDao createSellerDao() {
-		return new SellerDaoJDBC();
+		return new SellerDaoJDBC(DB.getConnection());
 	}
 
 }
