@@ -36,7 +36,7 @@ public class Program {
 		sd.insert(seller);
 		System.out.println("Inserted, new Id = " + seller.getId());
 		
-		System.out.println("\n====  Test 5: seller findById  ====");
+		System.out.println("\n====  Test 5: seller update  ====");
 		seller = sd.findById(1);
 		System.out.println("Antes do update: " + seller);
 		seller.setBaseSalary(3600.0);

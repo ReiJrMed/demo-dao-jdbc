@@ -79,7 +79,7 @@ public class SellerDaoJDBC implements SellerDao{
 			pst.executeUpdate();
 								
 		} catch(SQLException e) {
-			e.printStackTrace();
+			throw new DBException(e.getMessage());
 		} finally {
 			DB.closeStatement(pst);
 		}
